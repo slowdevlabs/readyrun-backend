@@ -1,4 +1,4 @@
-/*
+
 const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
@@ -33,10 +33,6 @@ setupSwagger(app);
 app.get('/', (req, res) => {
     res.send('ReadyRun API Server is running!');
   });
-*/
-
-const express = require('express');
-const app = express();
 
 app.get('/ping', (req, res) => {
   res.send('pong');
