@@ -1,0 +1,11 @@
+# 가상 환경 및 의존성 파일 제외
+node_modules/
+tests/
+
+# 환경 변수 및 보안 파일 제외
+.env
+readyrun-61799-firebase-adminsdk-fbsvc-ca24fc07b4.json
+.getToken.mjs
+
+# 로그 파일 및 캐시 파일 제외
+*.log
