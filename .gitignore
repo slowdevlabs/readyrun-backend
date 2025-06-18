@@ -1,6 +1,0 @@
-  node_modules/
-  doc/
-  .gitignore
-  .env
-  .DS_Store
-  npm-debug.log
