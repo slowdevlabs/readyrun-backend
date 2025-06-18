@@ -1,5 +1,5 @@
 // server.js
-/*
+
 const express = require('express');
 const cors = require('cors');
 const bodyPaser = require('body-parser');
@@ -40,4 +40,4 @@ app.listen(port, () => {
 ///app.listen(port, () => {
 ///  console.log(`✅ 서버 실행 중: http://localhost:${port}`);
 ///});
-*/
+
