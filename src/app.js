@@ -28,7 +28,6 @@ app.use(errorHandler);
 
 setupSwagger(app);
 
-module.exports = app;
 
 app.get('/', (req, res) => {
     res.send('ReadyRun API Server is running!');
@@ -37,3 +36,6 @@ app.get('/', (req, res) => {
 app.get('/ping', (req, res) => {
   res.send('pong');
 });
+
+
+module.exports = app;
