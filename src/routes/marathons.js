@@ -4,6 +4,9 @@ const marathonController = require('../controllers/marathonController');
 
 const router = express.Router();
 
+// 이 라우터의 모든 경로에 authenticate 미들웨어 적용
+router.use(authenticate);
+
 /**
  * @swagger
  * /marathons:
