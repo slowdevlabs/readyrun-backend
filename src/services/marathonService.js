@@ -1,65 +1,103 @@
 const supabase = require('../config/supabase');
 
+// 타임아웃 프로미스 생성 함수
+const withTimeout = (promise, timeoutMs = 3000) => {
+  let timeoutId;
+  
+  const timeoutPromise = new Promise((_, reject) => {
+    timeoutId = setTimeout(() => {
+      reject(new Error('Request timeout'));
+    }, timeoutMs);
+  });
+
+  return Promise.race([
+    promise,
+    timeoutPromise
+  ]).finally(() => clearTimeout(timeoutId));
+};
+
 /**
  * 마라톤 목록 조회 (필터, 정렬, 페이징)
  */
 exports.listMarathons = async (query, userId) => {
-  const {
-    page = 1,
-    limit = 20,
-    sort = 'date_asc',
-    country,
-    city,
-    distance,
-    date_from,
-    date_to,
-    tags
-  } = query;
+  try {
+    const {
+      page = 1,
+      limit = 20,
+      sort = 'date_asc',
+      country,
+      city,
+      distance,
+      date_from,
+      date_to,
+      tags
+    } = query;
 
-  let supaQuery = supabase
-    .from('marathons')
-    .select(`
-      *,
-      is_favorited:favorites!left(user_id)
-    `, { count: 'exact' })
-    .eq('status', 'active');
+    // 기본 쿼리 설정
+    const from = (page - 1) * limit;
+    const to = from + limit - 1;
 
-  if (country) supaQuery = supaQuery.eq('country', country);
-  if (city) supaQuery = supaQuery.eq('city', city);
-  if (distance) supaQuery = supaQuery.contains('distances', [distance]);
-  if (date_from) supaQuery = supaQuery.gte('date_start', date_from);
-  if (date_to) supaQuery = supaQuery.lte('date_start', date_to);
-  if (tags) supaQuery = supaQuery.contains('tags', tags);
+    // 최적화된 쿼리 빌드
+    let queryBuilder = supabase
+      .from('marathons')
+      .select('id, name, date_start, country, city, distances, status, favorite_count', { count: 'exact' })
+      .eq('status', 'active')
+      .range(from, to);
 
-  // 정렬
-  if (sort === 'date_asc') supaQuery = supaQuery.order('date_start', { ascending: true });
-  if (sort === 'date_desc') supaQuery = supaQuery.order('date_start', { ascending: false });
-  if (sort === 'popularity_desc') supaQuery = supaQuery.order('favorite_count', { ascending: false });
+    // 필터 적용
+    if (country) queryBuilder = queryBuilder.eq('country', country);
+    if (city) queryBuilder = queryBuilder.eq('city', city);
+    if (distance) queryBuilder = queryBuilder.contains('distances', [distance]);
+    if (date_from) queryBuilder = queryBuilder.gte('date_start', date_from);
+    if (date_to) queryBuilder = queryBuilder.lte('date_start', date_to);
+    if (tags) queryBuilder = queryBuilder.contains('tags', tags);
 
-  // 페이징
-  const from = (page - 1) * limit;
-  const to = from + limit - 1;
-  supaQuery = supaQuery.range(from, to);
+    // 정렬
+    if (sort === 'date_asc') queryBuilder = queryBuilder.order('date_start', { ascending: true });
+    if (sort === 'date_desc') queryBuilder = queryBuilder.order('date_start', { ascending: false });
+    if (sort === 'popularity_desc') queryBuilder = queryBuilder.order('favorite_count', { ascending: false });
 
-  const { data, count, error } = await supaQuery;
-  if (error) throw error;
+    // 쿼리 실행
+    const { data: marathons, count, error } = await queryBuilder;
+    
+    if (error) throw error;
 
-  // is_favorited 처리
-  const marathons = data.map(m => ({
-    ...m,
-    is_favorited: !!(m.is_favorited && m.is_favorited.user_id === userId)
-  }));
-
-  return {
-    marathons,
-    pagination: {
-      current_page: Number(page),
-      total_pages: Math.ceil(count / limit),
-      total_count: count,
-      has_next: to + 1 < count,
-      has_prev: from > 0
+    // 즐겨찾기 상태 확인 (별도 쿼리로 분리)
+    let favorites = [];
+    if (userId) {
+      const { data: favData } = await supabase
+        .from('favorites')
+        .select('marathon_id')
+        .eq('user_id', userId)
+        .in('marathon_id', marathons.map(m => m.id));
+      
+      favorites = favData?.map(f => f.marathon_id) || [];
     }
-  };
+
+    // 결과 조합
+    const result = marathons.map(marathon => ({
+      ...marathon,
+      is_favorited: favorites.includes(marathon.id)
+    }));
+
+    return {
+      marathons: result,
+      pagination: {
+        current_page: Number(page),
+        total_pages: Math.ceil(count / limit),
+        total_count: count,
+        has_next: to + 1 < count,
+        has_prev: from > 0
+      }
+    };
+  } catch (error) {
+    console.error('Marathon service error:', error);
+    throw {
+      code: error.code || 'INTERNAL_ERROR',
+      message: error.message || 'Internal server error',
+      status: error.status || 500
+    };
+  }
 };
 
 /**
@@ -86,7 +124,7 @@ exports.getMarathonDetail = async (id, userId) => {
   }
 
   // 조회수 증가 (비동기)
-  supabase
+  await supabase
     .from('marathons')
     .update({ view_count: (data.view_count || 0) + 1 })
     .eq('id', id);

@@ -1,10 +1,11 @@
 {
   "name": "readyrun-backend",
   "version": "1.0.0",
-  "main": "server.js",
+  "main": "index.js",
   "scripts": {
-    "start": "node api/server.js",
-    "dev": "nodemon api/server.js"
+    "start": "node api/index.js",
+    "dev": "nodemon src/index.js",
+    "local": "node src/index.js"
   },
   "keywords": [],
   "author": "",
@@ -19,14 +20,15 @@
     "firebase": "^11.9.1",
     "firebase-admin": "^13.4.0",
     "morgan": "^1.10.0",
-    "serverless-http": "^3.0.0",
+    "serverless-http": "^3.2.0",
     "swagger-jsdoc": "^6.2.8",
-    "swagger-ui-express": "^5.0.1"
+    "swagger-ui-express": "^5.0.1",
+    "@vercel/node": "^3.0.24"
   },
   "devDependencies": {
     "nodemon": "^3.1.10"
   },
   "engines": {
-    "node": "22.x"
+    "node": "20.x"
   }
 }

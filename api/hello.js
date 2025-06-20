@@ -1,3 +1,3 @@
 module.exports = (req, res) => {
-    res.status(200).send('Hello World');
+    res.status(200).send('Hello from simple API!');
   };

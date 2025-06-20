@@ -1,5 +1,6 @@
 const swaggerJsdoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
+const path = require('path');
 
 const options = {
   definition: {
@@ -10,7 +11,7 @@ const options = {
       description: 'ReadyRun 마라톤 정보 서비스 API 문서'
     },
     servers: [
-      { url: 'http://localhost:4000/api/v1' }
+      { url: process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000' }
     ],
     components: {
       securitySchemes: {
@@ -23,11 +24,20 @@ const options = {
     },
     security: [{ bearerAuth: [] }]
   },
-  apis: ['./src/routes/*.js'], // JSDoc 주석 기반으로 API 문서 자동 생성
+  // Vercel 빌드 환경을 고려하여 절대 경로로 변경
+  apis: [path.join(process.cwd(), 'src', 'routes', '*.js')],
 };
 
-const specs = swaggerJsdoc(options);
-
-module.exports = (app) => {
-  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
+// 개발 환경에서만 Swagger를 활성화
+module.exports = async (app) => {
+  if (process.env.NODE_ENV !== 'production') {
+    try {
+      // swagger-jsdoc을 비동기로 처리하여 서버 시작을 막지 않도록 함
+      const specs = await swaggerJsdoc(options);
+      app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
+      console.log('Swagger UI setup complete.');
+    } catch (error) {
+      console.error('Failed to setup Swagger UI:', error);
+    }
+  }
 };
