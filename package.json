@@ -13,6 +13,7 @@
   "description": "",
   "dependencies": {
     "@supabase/supabase-js": "^2.50.0",
+    "@vercel/node": "^3.0.24",
     "body-parser": "^2.2.0",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
@@ -22,8 +23,7 @@
     "morgan": "^1.10.0",
     "serverless-http": "^3.2.0",
     "swagger-jsdoc": "^6.2.8",
-    "swagger-ui-express": "^5.0.1",
-    "@vercel/node": "^3.0.24"
+    "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
     "nodemon": "^3.1.10"

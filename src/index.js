@@ -3,10 +3,7 @@ const cors = require('cors');
 const morgan = require('morgan');
 const { errorHandler } = require('./middleware/errorHandler');
 // const setupSwagger = require('./swagger');
-const { initializeFirebase } = require('./config/firebase');
-
-// Firebase 초기화
-initializeFirebase();
+require('./config/firebase');
 
 const app = express();
 
