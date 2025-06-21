@@ -15,12 +15,6 @@ router.post('/register', async (req, res) => {
 
   try {
     // Firebase UID 유효성 검사
-    console.log(`[AUTH] Validating Firebase UID. Value: "${firebase_uid}", Type: ${typeof firebase_uid}`);
-    if (!firebase_uid || typeof firebase_uid !== 'string') {
-      console.error('[AUTH] firebase_uid is invalid or not provided.');
-      return res.status(400).json({ success: false, message: 'Firebase UID is required.' });
-    }
-
     const userRecord = await admin.auth().getUser(firebase_uid);
 
     if (!userRecord) {
@@ -28,7 +22,6 @@ router.post('/register', async (req, res) => {
     }
 
     // Supabase에 사용자 등록
-    console.log(`Attempting to insert user into Supabase with firebase_uid: ${firebase_uid}`);
     const { data, error } = await supabase
       .from('users') // Supabase 테이블명
       .insert([
@@ -44,11 +37,9 @@ router.post('/register', async (req, res) => {
       .single();
 
     if (error) {
-      console.error('>>> SUPABASE INSERT ERROR:', JSON.stringify(error, null, 2));
       throw error;
     }
 
-    console.log('Successfully inserted user into Supabase.');
     return res.status(200).json({
       success: true,
       data: { user: data },

@@ -8,18 +8,18 @@ const asyncHandler = fn => (req, res, next) => {
 
 // 마라톤 목록 조회
 exports.listMarathons = asyncHandler(async (req, res) => {
-  const data = await marathonService.listMarathons(req.query, req.user?.db?.id);
-  res.json(success({ marathons: data.marathons, pagination: data.pagination }));
+    const data = await marathonService.listMarathons(req.query, req.user?.db?.id);
+    res.json(success({ marathons: data.marathons, pagination: data.pagination }));
 });
 
 // 마라톤 검색
 exports.searchMarathons = asyncHandler(async (req, res) => {
-  const data = await marathonService.searchMarathons(req.query, req.user?.db?.id);
-  res.json(success({ marathons: data.marathons, pagination: data.pagination }));
+    const data = await marathonService.searchMarathons(req.query, req.user?.db?.id);
+    res.json(success({ marathons: data.marathons, pagination: data.pagination }));
 });
 
 // 마라톤 상세 조회
 exports.getMarathonDetail = asyncHandler(async (req, res) => {
-  const data = await marathonService.getMarathonDetail(req.params.id, req.user?.db?.id);
-  res.json(success({ marathon: data }));
+    const data = await marathonService.getMarathonDetail(req.params.id, req.user?.db?.id);
+    res.json(success({ marathon: data }));
 });

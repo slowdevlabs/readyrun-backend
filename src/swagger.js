@@ -34,7 +34,7 @@ module.exports = async (app) => {
     try {
       // swagger-jsdoc을 비동기로 처리하여 서버 시작을 막지 않도록 함
       const specs = await swaggerJsdoc(options);
-      app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
+  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
       console.log('Swagger UI setup complete.');
     } catch (error) {
       console.error('Failed to setup Swagger UI:', error);

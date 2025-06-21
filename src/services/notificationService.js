@@ -1,4 +1,5 @@
 const supabase = require('../config/supabase');
+const { toISOString } = require('../utils/dateFormatter');
 
 /**
  * 알림 목록 조회
@@ -14,7 +15,7 @@ exports.listNotifications = async (userId, page = 1, limit = 20) => {
     .range(from, to);
   if (error) throw error;
   return {
-    notifications: data,
+    notifications: toISOString(data, ['created_at']),
     pagination: {
       current_page: Number(page),
       total_pages: Math.ceil(count / limit),

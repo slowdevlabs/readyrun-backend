@@ -1,4 +1,5 @@
 const supabase = require('../config/supabase');
+const { toISOString } = require('../utils/dateFormatter');
 
 // 타임아웃 프로미스 생성 함수
 const withTimeout = (promise, timeoutMs = 3000) => {
@@ -40,7 +41,7 @@ exports.listMarathons = async (query, userId) => {
     // 최적화된 쿼리 빌드
     let queryBuilder = supabase
       .from('marathons')
-      .select('id, name, date_start, country, city, distances, status, favorite_count', { count: 'exact' })
+      .select('*', { count: 'exact' })
       .eq('status', 'active')
       .range(from, to);
 
@@ -81,7 +82,7 @@ exports.listMarathons = async (query, userId) => {
     }));
 
     return {
-      marathons: result,
+      marathons: toISOString(result, ['date_start', 'date_end']),
       pagination: {
         current_page: Number(page),
         total_pages: Math.ceil(count / limit),
@@ -129,7 +130,7 @@ exports.getMarathonDetail = async (id, userId) => {
     .update({ view_count: (data.view_count || 0) + 1 })
     .eq('id', id);
 
-  return { ...data, is_favorited };
+  return toISOString({ ...data, is_favorited }, ['created_at', 'date_start', 'date_end']);
 };
 
 /**
@@ -185,7 +186,7 @@ exports.searchMarathons = async (query, userId) => {
   }));
 
   return {
-    marathons,
+    marathons: toISOString(marathons, ['date_start', 'date_end']),
     pagination: {
       current_page: Number(page),
       total_pages: Math.ceil(count / limit),

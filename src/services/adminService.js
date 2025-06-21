@@ -1,4 +1,5 @@
 const supabase = require('../config/supabase');
+const { toISOString } = require('../utils/dateFormatter');
 
 // 승인 대기 마라톤 목록 조회
 exports.listPendingMarathons = async () => {
@@ -8,7 +9,7 @@ exports.listPendingMarathons = async () => {
     .eq('status', 'pending')
     .order('created_at', { ascending: true });
   if (error) throw error;
-  return data;
+  return toISOString(data, ['created_at', 'date_start', 'approved_at', 'date_end', 'registration_deadline', 'updated_at']);
 };
 
 // 마라톤 승인 처리

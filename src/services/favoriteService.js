@@ -1,4 +1,5 @@
 const supabase = require('../config/supabase');
+const { toISOString } = require('../utils/dateFormatter');
 
 /**
  * 즐겨찾기 목록 조회
@@ -10,10 +11,11 @@ exports.listFavorites = async (userId) => {
     .eq('user_id', userId)
     .order('created_at', { ascending: false });
   if (error) throw error;
-  return data.map(fav => ({
+  const favorites = data.map(fav => ({
     ...fav.marathons,
     favorited_at: fav.created_at
   }));
+  return toISOString(favorites, ['date_start', 'favorited_at']);
 };
 
 /**
