@@ -15,6 +15,12 @@ router.post('/register', async (req, res) => {
 
   try {
     // Firebase UID 유효성 검사
+    console.log(`[AUTH] Validating Firebase UID. Value: "${firebase_uid}", Type: ${typeof firebase_uid}`);
+    if (!firebase_uid || typeof firebase_uid !== 'string') {
+      console.error('[AUTH] firebase_uid is invalid or not provided.');
+      return res.status(400).json({ success: false, message: 'Firebase UID is required.' });
+    }
+
     const userRecord = await admin.auth().getUser(firebase_uid);
 
     if (!userRecord) {
