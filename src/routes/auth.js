@@ -22,6 +22,7 @@ router.post('/register', async (req, res) => {
     }
 
     // Supabase에 사용자 등록
+    console.log(`Attempting to insert user into Supabase with firebase_uid: ${firebase_uid}`);
     const { data, error } = await supabase
       .from('users') // Supabase 테이블명
       .insert([
@@ -37,9 +38,11 @@ router.post('/register', async (req, res) => {
       .single();
 
     if (error) {
+      console.error('>>> SUPABASE INSERT ERROR:', JSON.stringify(error, null, 2));
       throw error;
     }
 
+    console.log('Successfully inserted user into Supabase.');
     return res.status(200).json({
       success: true,
       data: { user: data },
