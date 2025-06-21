@@ -23,6 +23,7 @@ app.use('/api/v1/auth', (req, res, next) => require('./routes/auth')(req, res, n
 app.use('/api/v1/marathons', (req, res, next) => require('./routes/marathons')(req, res, next));
 app.use('/api/v1/favorites', (req, res, next) => require('./routes/favorites')(req, res, next));
 app.use('/api/v1/notifications', (req, res, next) => require('./routes/notifications')(req, res, next));
+app.use('/api/v1/user', (req, res, next) => require('./routes/user')(req, res, next));
 app.use('/api/v1/admin', (req, res, next) => require('./routes/admin')(req, res, next));
 app.use('/api/v1/health', (req, res, next) => require('./routes/health')(req, res, next));
 
